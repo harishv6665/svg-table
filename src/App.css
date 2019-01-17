@@ -44,6 +44,10 @@
   display: none;
 }
 
+.translucent {
+  opacity: 0.2;
+}
+
 .modesListContainer {
   display: flex;
 }

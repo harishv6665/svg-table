@@ -123,19 +123,19 @@ const { tableRowCords, tableCellCords } = tableRowCellCords;
 
 
 const Rectangle = ({
-  x, y, width, height, fill, stroke, className, selectedItems, onClick, id
+  x, y, width, height, fill, stroke, className, selectedItems, onClick, id,
+  fillOpacity,
 }) => (
   <rect
     x={x}
     y={y}
     width={width}
     height={height}
-    // fill={fill}
-    fill={selectedItems.has(id) ? "green" : "transparent"}
+    fill={fill}
     stroke={stroke}
     className={className}
     onClick={onClick}
-    // onClick={ () => console.log(x, y)}
+    fillOpacity={fillOpacity}
   />
 )
 
@@ -147,15 +147,16 @@ const drawRectangles = (rectangles, customClassName, selectedItems, onClick) => 
     return (
       <Rectangle
         id={id}
-      x={x}
-      y={y}
-      width={width}
-      height={height}
-      fill={fill}
-      stroke={stroke}
-      className={classNames(customClassName, className)}
-      onClick={e => {onClick(e, data);}}
-      selectedItems={selectedItems}
+        x={x}
+        y={y}
+        width={width}
+        height={height}
+        stroke={stroke}
+        fill={selectedItems.has(id) ? "blue" : "transparent"}
+        className={classNames(customClassName, className)}
+        onClick={e => {onClick(e, data);}}
+        selectedItems={selectedItems}
+        fillOpacity={selectedItems.has(id) ? .2 : 1}
     />
     )
   });
@@ -168,7 +169,7 @@ class App extends Component {
       mode: 'view', // view | edit,
       editEntity: 'cell', // 'cell' | 'column' | 'row' | 'table'
       editAction: 'merge', // 'merge' | 'delete'
-      selectedItems: new Set([1, 2, 3, 4, 5]),
+      selectedItems: new Set([]),
     };
     this.handleClick = this.handleClick.bind(this);
   }
@@ -205,7 +206,10 @@ class App extends Component {
               <select
                 id="modeSelect"
                 value={this.state.mode}
-                onChange={e => this.setState({mode: e.target.value})}
+                onChange={e => this.setState({
+                  mode: e.target.value,
+                  selectedItems: new Set([]),
+                })}
               >
                 <option value="view">view</option>
                 <option value="edit">edit</option>
@@ -216,7 +220,10 @@ class App extends Component {
               <select
                 id="editEntitySelect"
                 value={this.state.editEntity}
-                onChange={e => this.setState({ editEntity: e.target.value })}
+                onChange={e => this.setState({
+                  editEntity: e.target.value,
+                  selectedItems: new Set([]),
+                })}
               >
                 <option value="cell">cell</option>
                 <option value="column">column</option>
@@ -229,7 +236,10 @@ class App extends Component {
               <select
                 id="editActionSelect"
                 value={this.state.editAction}
-                onChange={e => this.setState({ editAction: e.target.value })}
+                onChange={e => this.setState({
+                  editAction: e.target.value,
+                  selectedItems: new Set([]),
+                })}
               >
                 <option value="merge">Merge</option>
                 <option value="delete">Delete</option>
