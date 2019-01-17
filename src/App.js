@@ -175,9 +175,10 @@ const drawSplitLine = ({
     y1={y1}
     x2={x2}
     y2={y2}
-    stroke="black"
+    stroke="white"
     stroke-width=".01"
-    stroke-dasharray=".1"
+    stroke-dasharray=".2"
+    strokeOpacity={1}
   />
 );
 
@@ -202,12 +203,13 @@ class App extends Component {
       let pt = this.svgRef.createSVGPoint();
       pt.x = e.clientX; pt.y = e.clientY;
       const hoverCoordinates = pt.matrixTransform(this.svgRef.getScreenCTM().inverse());
-      // this.setState({
-      //   x1: hoverCoordinates.x,
-      //   y1,
-      //   x2: hoverCoordinates.x,
-      //   y2,
-      // })
+      this.setState({
+        splitLineCoordinates: {
+        x1: hoverCoordinates.x,
+        y1: item.y,
+        x2: hoverCoordinates.x,
+        y2: item.y + item.height,
+      }})
       // console.log({ l });
       // console.log('item ', item.id, ' hovered of type: ', item.type, ' for action: ', this.state.editAction, e.clientX, e.clientY)
       // const { selectedItems } = this.state;
@@ -235,7 +237,7 @@ class App extends Component {
   }
 
   render() {
-    const { mode, editEntity, selectedItems } = this.state;
+    const { mode, editEntity, selectedItems, splitLineCoordinates } = this.state;
     const applyHiddenClassName = (entityName) => mode === 'edit' && editEntity !== entityName ? 'noDisplay' : '';
 
     const tableClassNames = applyHiddenClassName('table');
@@ -300,7 +302,7 @@ class App extends Component {
             {drawRectangles(tableRowCords, tableRowClassNames, selectedItems, this.handleClick, this.handleHover)}
             {drawRectangles(tableColCords, tableColumnClassNames, selectedItems, this.handleClick, this.handleHover)}
             {drawRectangles(tableCellCords, tableCellClassNames, selectedItems, this.handleClick, this.handleHover)}
-            {/*{drawSplitLine()}*/}
+            {splitLineCoordinates && drawSplitLine(splitLineCoordinates)}
           </svg>
         </div>
       </div>
