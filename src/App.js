@@ -123,8 +123,9 @@ const { tableRowCords, tableCellCords } = tableRowCellCords;
 
 
 const Rectangle = ({
-  x, y, width, height, fill, stroke, className, selectedItems, onClick, id,
-  fillOpacity,
+  x, y, width, height, fill, stroke,
+  className, selectedItems, onClick,
+  onHover, id, fillOpacity,
 }) => (
   <rect
     x={x}
@@ -135,11 +136,12 @@ const Rectangle = ({
     stroke={stroke}
     className={className}
     onClick={onClick}
+    onMouseMove={onHover}
     fillOpacity={fillOpacity}
   />
 )
 
-const drawRectangles = (rectangles, customClassName, selectedItems, onClick) => rectangles
+const drawRectangles = (rectangles, customClassName, selectedItems, onClick, onHover) => rectangles
   .map((data) => {
     const {
       x, y, width, height, fill, stroke, className, id,
@@ -155,11 +157,29 @@ const drawRectangles = (rectangles, customClassName, selectedItems, onClick) => 
         fill={selectedItems.has(id) ? "blue" : "transparent"}
         className={classNames(customClassName, className)}
         onClick={e => {onClick(e, data);}}
+        onHover={e => {onHover(e, data);}}
         selectedItems={selectedItems}
         fillOpacity={selectedItems.has(id) ? .2 : 1}
     />
     )
   });
+
+const drawSplitLine = ({
+   x1,
+   y1,
+   x2,
+   y2,
+ }) => (
+  <line
+    x1={x1}
+    y1={y1}
+    x2={x2}
+    y2={y2}
+    stroke="black"
+    stroke-width=".01"
+    stroke-dasharray=".1"
+  />
+);
 
 class App extends Component {
 
@@ -168,10 +188,36 @@ class App extends Component {
     this.state = {
       mode: 'view', // view | edit,
       editEntity: 'cell', // 'cell' | 'column' | 'row' | 'table'
-      editAction: 'merge', // 'merge' | 'delete'
+      editAction: 'merge', // 'merge' | 'delete' | 'split'
       selectedItems: new Set([]),
+      splitLineCoordinates: null,
     };
     this.handleClick = this.handleClick.bind(this);
+    this.handleHover = this.handleHover.bind(this);
+  }
+
+  handleHover(e, item) {
+    if (this.state.mode !== 'view' && this.state.editAction === 'split') {
+      e.stopPropagation();
+      let pt = this.svgRef.createSVGPoint();
+      pt.x = e.clientX; pt.y = e.clientY;
+      const hoverCoordinates = pt.matrixTransform(this.svgRef.getScreenCTM().inverse());
+      // this.setState({
+      //   x1: hoverCoordinates.x,
+      //   y1,
+      //   x2: hoverCoordinates.x,
+      //   y2,
+      // })
+      // console.log({ l });
+      // console.log('item ', item.id, ' hovered of type: ', item.type, ' for action: ', this.state.editAction, e.clientX, e.clientY)
+      // const { selectedItems } = this.state;
+      // this.setState({
+      //   selectedItems: selectedItems.has(item.id) ?
+      //     (this.state.selectedItems.delete(item.id) && this.state.selectedItems) : this.state.selectedItems.add(item.id),
+      // })
+    } else {
+      // highlightTableData();
+    }
   }
 
   handleClick(e, item) {
@@ -243,16 +289,18 @@ class App extends Component {
               >
                 <option value="merge">Merge</option>
                 <option value="delete">Delete</option>
+                <option value="split">Split</option>
               </select>
             </div>
           </div>
         </header>
         <div className="App-content">
-          <svg>
-            {drawRectangles(tableCords, tableClassNames, selectedItems, this.handleClick)}
-            {drawRectangles(tableRowCords, tableRowClassNames, selectedItems, this.handleClick)}
-            {drawRectangles(tableColCords, tableColumnClassNames, selectedItems, this.handleClick)}
-            {drawRectangles(tableCellCords, tableCellClassNames, selectedItems, this.handleClick)}
+          <svg ref={r => this.svgRef = r}>
+            {drawRectangles(tableCords, tableClassNames, selectedItems, this.handleClick, this.handleHover)}
+            {drawRectangles(tableRowCords, tableRowClassNames, selectedItems, this.handleClick, this.handleHover)}
+            {drawRectangles(tableColCords, tableColumnClassNames, selectedItems, this.handleClick, this.handleHover)}
+            {drawRectangles(tableCellCords, tableCellClassNames, selectedItems, this.handleClick, this.handleHover)}
+            {/*{drawSplitLine()}*/}
           </svg>
         </div>
       </div>
