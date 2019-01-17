@@ -123,7 +123,7 @@ const { tableRowCords, tableCellCords } = tableRowCellCords;
 
 
 const Rectangle = ({
-  x, y, width, height, fill, stroke, className,
+  x, y, width, height, fill, stroke, className, onClick
 }) => (
   <rect
     x={x}
@@ -131,17 +131,21 @@ const Rectangle = ({
     width={width}
     height={height}
     // fill={fill}
-    fill="none"
+    fill="transparent"
     stroke={stroke}
     className={className}
+    onClick={onClick}
+    // onClick={ () => console.log(x, y)}
   />
 )
 
-const drawRectangles = (rectangles, customClassName) => rectangles
-  .map(({
-    x, y, width, height, fill, stroke, className,
-  }) =>(
-    <Rectangle
+const drawRectangles = (rectangles, customClassName, onClick) => rectangles
+  .map((data) => {
+    const {
+      x, y, width, height, fill, stroke, className,
+    } = data;
+    return (
+      <Rectangle
       x={x}
       y={y}
       width={width}
@@ -149,8 +153,10 @@ const drawRectangles = (rectangles, customClassName) => rectangles
       fill={fill}
       stroke={stroke}
       className={classNames(customClassName, className)}
+      onClick={e => {onClick(e, data);}}
     />
-  ));
+    )
+  });
 
 class App extends Component {
 
@@ -159,8 +165,19 @@ class App extends Component {
     this.state = {
       mode: 'view', // view | edit,
       editEntity: 'cell', // 'cell' | 'column' | 'row' | 'table'
-      editActionType: 'merge', // 'merge' | 'delete'
+      editAction: 'merge', // 'merge' | 'delete'
     };
+    this.handleClick = this.handleClick.bind(this);
+  }
+
+  handleClick(e, item) {
+    if (this.state.mode !== 'view') {
+      e.stopPropagation();
+      console.log('item ', item.id, ' clicked of type: ', item.type, ' for action: ', this.state.editAction)
+      alert('item '+ item.id+ ' clicked of type: '+ item.type+ ' for action: '+ this.state.editAction)
+    } else {
+      // highlightTableData();
+    }
   }
 
   render() {
@@ -188,7 +205,7 @@ class App extends Component {
               </select>
             </div>
             <div className="modeContainer">
-              <label htmlFor="editEntitySelect">Mode: </label>
+              <label htmlFor="editEntitySelect">Editing entity: </label>
               <select
                 id="editEntitySelect"
                 value={this.state.editEntity}
@@ -200,14 +217,25 @@ class App extends Component {
                 <option value="table">table</option>
               </select>
             </div>
+            <div className="modeContainer">
+              <label htmlFor="editEntitySelect">Editing Action: </label>
+              <select
+                id="editActionSelect"
+                value={this.state.editAction}
+                onChange={e => this.setState({ editAction: e.target.value })}
+              >
+                <option value="merge">Merge</option>
+                <option value="delete">Delete</option>
+              </select>
+            </div>
           </div>
         </header>
         <div className="App-content">
           <svg>
-            {drawRectangles(tableCords, tableClassNames)}
-            {drawRectangles(tableRowCords, tableRowClassNames)}
-            {drawRectangles(tableColCords, tableColumnClassNames)}
-            {drawRectangles(tableCellCords, tableCellClassNames)}
+            {drawRectangles(tableCords, tableClassNames, this.handleClick)}
+            {drawRectangles(tableRowCords, tableRowClassNames, this.handleClick)}
+            {drawRectangles(tableColCords, tableColumnClassNames, this.handleClick)}
+            {drawRectangles(tableCellCords, tableCellClassNames, this.handleClick)}
           </svg>
         </div>
       </div>
