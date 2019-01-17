@@ -175,35 +175,41 @@ class App extends Component {
     return (
       <div className="App">
         <header className="App-header">
-
-          <label for="modeSelect">Mode: </label>
-          <select
-            id="modeSelect"
-            value={this.state.mode}
-            onChange={e => this.setState({ mode: e.target.value })}
-          >
-            <option value="view">view</option>
-            <option value="edit">edit</option>
-          </select>
-
-          <label htmlFor="editEntitySelect">Mode: </label>
-          <select
-            id="editEntitySelect"
-            value={this.state.editEntity}
-            onChange={e => this.setState({ editEntity: e.target.value })}
-          >
-            <option value="cell">cell</option>
-            <option value="column">column</option>
-            <option value="row">row</option>
-            <option value="table">table</option>
-          </select>
+          <div className="modesListContainer">
+            <div className="modeContainer">
+              <label htmlFor="modeSelect">Mode: </label>
+              <select
+                id="modeSelect"
+                value={this.state.mode}
+                onChange={e => this.setState({mode: e.target.value})}
+              >
+                <option value="view">view</option>
+                <option value="edit">edit</option>
+              </select>
+            </div>
+            <div className="modeContainer">
+              <label htmlFor="editEntitySelect">Mode: </label>
+              <select
+                id="editEntitySelect"
+                value={this.state.editEntity}
+                onChange={e => this.setState({ editEntity: e.target.value })}
+              >
+                <option value="cell">cell</option>
+                <option value="column">column</option>
+                <option value="row">row</option>
+                <option value="table">table</option>
+              </select>
+            </div>
+          </div>
+        </header>
+        <div className="App-content">
           <svg>
             {drawRectangles(tableCords, tableClassNames)}
             {drawRectangles(tableRowCords, tableRowClassNames)}
             {drawRectangles(tableColCords, tableColumnClassNames)}
             {drawRectangles(tableCellCords, tableCellClassNames)}
           </svg>
-        </header>
+        </div>
       </div>
     );
   }
