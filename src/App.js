@@ -123,7 +123,7 @@ const { tableRowCords, tableCellCords } = tableRowCellCords;
 
 
 const Rectangle = ({
-  x, y, width, height, fill, stroke, className, onClick
+  x, y, width, height, fill, stroke, className, selectedItems, onClick, id
 }) => (
   <rect
     x={x}
@@ -131,7 +131,7 @@ const Rectangle = ({
     width={width}
     height={height}
     // fill={fill}
-    fill="transparent"
+    fill={selectedItems.has(id) ? "green" : "transparent"}
     stroke={stroke}
     className={className}
     onClick={onClick}
@@ -139,13 +139,14 @@ const Rectangle = ({
   />
 )
 
-const drawRectangles = (rectangles, customClassName, onClick) => rectangles
+const drawRectangles = (rectangles, customClassName, selectedItems, onClick) => rectangles
   .map((data) => {
     const {
-      x, y, width, height, fill, stroke, className,
+      x, y, width, height, fill, stroke, className, id,
     } = data;
     return (
       <Rectangle
+        id={id}
       x={x}
       y={y}
       width={width}
@@ -154,6 +155,7 @@ const drawRectangles = (rectangles, customClassName, onClick) => rectangles
       stroke={stroke}
       className={classNames(customClassName, className)}
       onClick={e => {onClick(e, data);}}
+      selectedItems={selectedItems}
     />
     )
   });
@@ -166,6 +168,7 @@ class App extends Component {
       mode: 'view', // view | edit,
       editEntity: 'cell', // 'cell' | 'column' | 'row' | 'table'
       editAction: 'merge', // 'merge' | 'delete'
+      selectedItems: new Set([1, 2, 3, 4, 5]),
     };
     this.handleClick = this.handleClick.bind(this);
   }
@@ -174,14 +177,18 @@ class App extends Component {
     if (this.state.mode !== 'view') {
       e.stopPropagation();
       console.log('item ', item.id, ' clicked of type: ', item.type, ' for action: ', this.state.editAction)
-      alert('item '+ item.id+ ' clicked of type: '+ item.type+ ' for action: '+ this.state.editAction)
+      const { selectedItems } = this.state;
+      this.setState({
+        selectedItems: selectedItems.has(item.id) ?
+          (this.state.selectedItems.delete(item.id) && this.state.selectedItems) : this.state.selectedItems.add(item.id),
+      })
     } else {
       // highlightTableData();
     }
   }
 
   render() {
-    const { mode, editEntity } = this.state;
+    const { mode, editEntity, selectedItems } = this.state;
     const applyHiddenClassName = (entityName) => mode === 'edit' && editEntity !== entityName ? 'noDisplay' : '';
 
     const tableClassNames = applyHiddenClassName('table');
@@ -232,10 +239,10 @@ class App extends Component {
         </header>
         <div className="App-content">
           <svg>
-            {drawRectangles(tableCords, tableClassNames, this.handleClick)}
-            {drawRectangles(tableRowCords, tableRowClassNames, this.handleClick)}
-            {drawRectangles(tableColCords, tableColumnClassNames, this.handleClick)}
-            {drawRectangles(tableCellCords, tableCellClassNames, this.handleClick)}
+            {drawRectangles(tableCords, tableClassNames, selectedItems, this.handleClick)}
+            {drawRectangles(tableRowCords, tableRowClassNames, selectedItems, this.handleClick)}
+            {drawRectangles(tableColCords, tableColumnClassNames, selectedItems, this.handleClick)}
+            {drawRectangles(tableCellCords, tableCellClassNames, selectedItems, this.handleClick)}
           </svg>
         </div>
       </div>
