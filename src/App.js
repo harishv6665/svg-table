@@ -14,13 +14,13 @@ const tableData = {
   tableCols: [
     {
       id: 'col1',
-      coordinates: { x: 0, y: 0, width: 100, height: 100 },
+      coordinates: { x: 5, y: 5, width: 90, height: 90 },
       styles: { stroke: 'blue', fill: 'transparent' },
       type: 'col',
     },
     {
       id: 'col2',
-      coordinates: { x: 100, y: 0, width: 100, height: 100 },
+      coordinates: { x: 105, y: 5, width: 90, height: 90 },
       styles: { stroke: 'blue', fill: 'transparent' },
       type: 'col',
     },
@@ -29,7 +29,7 @@ const tableData = {
     {
       id: 'row1',
       isHeader: true,
-      coordinates: { x: 0, y: 0, width: 200, height: 50 },
+      coordinates: { x: 5, y: 5, width: 180, height: 45 },
       styles: { stroke: 'green', fill: 'transparent' },
       type: 'row',
       cells: [
@@ -39,7 +39,7 @@ const tableData = {
           colSpan: 1,
           rowSpan: 1,
           value: 'c-11',
-          coordinates: { x: 0, y: 0, width: 100, height: 50 },
+          coordinates: { x: 10, y: 10, width: 85, height: 35 },
           styles: { stroke: 'yellow', fill: '#ccc' },
           type: 'cell',
         },
@@ -49,7 +49,7 @@ const tableData = {
           colSpan: 1,
           rowSpan: 1,
           value: 'c-12',
-          coordinates: { x: 100, y: 0, width: 100, height: 50 },
+          coordinates: { x: 100, y: 10, width: 85, height: 35 },
           styles: { stroke: 'yellow', fill: '#ccc' },
           type: 'cell',
         },
@@ -58,7 +58,7 @@ const tableData = {
     {
       id: 'row2',
       isHeader: true,
-      coordinates: { x: 0, y: 50, width: 200, height: 50 },
+      coordinates: { x: 5, y: 55, width: 180, height: 45 },
       styles: { stroke: 'green', fill: 'transparent' },
       type: 'row',
       cells: [
@@ -68,7 +68,7 @@ const tableData = {
           colSpan: 1,
           rowSpan: 1,
           value: 'c-21',
-          coordinates: { x: 0, y: 50, width: 200, height: 50 },
+          coordinates: { x: 10, y: 55, width: 85, height: 35 },
           styles: { stroke: 'yellow', fill: '#ccc' },
           type: 'cell',
         },
@@ -78,7 +78,7 @@ const tableData = {
           colSpan: 1,
           rowSpan: 1,
           value: 'c-22',
-          coordinates: { x: 100, y: 50, width: 100, height: 50 },
+          coordinates: { x: 100, y: 55, width: 85, height: 35 },
           styles: { stroke: 'yellow', fill: '#ccc' },
           type: 'cell',
         },
@@ -168,8 +168,8 @@ class App extends Component {
     const applyHiddenClassName = (entityName) => mode === 'edit' && editEntity !== entityName ? 'noDisplay' : '';
 
     const tableClassNames = applyHiddenClassName('table');
-    const tableRowClassNames = applyHiddenClassName('row');
-    const tableColumnClassNames = applyHiddenClassName('column');
+    const tableRowClassNames = mode === 'view' ? 'noDisplay' : applyHiddenClassName('row');
+    const tableColumnClassNames = mode === 'view' ? 'noDisplay' : applyHiddenClassName('column');
     const tableCellClassNames = applyHiddenClassName('cell');
 
     return (
