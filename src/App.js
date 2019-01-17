@@ -1,24 +1,208 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
+import classNames from 'classnames';
+
+
+const tableData = {
+  id: 't1',
+  confidenceScore: 50,
+  tag: 'Bank details',
+  coordinates: { x: 0, y: 0, width: 200, height: 100 },
+  styles: { stroke: 'red', fill: 'transparent' },
+  type: 'table',
+  tableCols: [
+    {
+      id: 'col1',
+      coordinates: { x: 0, y: 0, width: 100, height: 100 },
+      styles: { stroke: 'blue', fill: 'transparent' },
+      type: 'col',
+    },
+    {
+      id: 'col2',
+      coordinates: { x: 100, y: 0, width: 100, height: 100 },
+      styles: { stroke: 'blue', fill: 'transparent' },
+      type: 'col',
+    },
+  ],
+  tableRows: [
+    {
+      id: 'row1',
+      isHeader: true,
+      coordinates: { x: 0, y: 0, width: 200, height: 50 },
+      styles: { stroke: 'green', fill: 'transparent' },
+      type: 'row',
+      cells: [
+        {
+          id: 'cell11',
+          isNull: false,
+          colSpan: 1,
+          rowSpan: 1,
+          value: 'c-11',
+          coordinates: { x: 0, y: 0, width: 100, height: 50 },
+          styles: { stroke: 'yellow', fill: '#ccc' },
+          type: 'cell',
+        },
+        {
+          id: 'cell12',
+          isNull: false,
+          colSpan: 1,
+          rowSpan: 1,
+          value: 'c-12',
+          coordinates: { x: 100, y: 0, width: 100, height: 50 },
+          styles: { stroke: 'yellow', fill: '#ccc' },
+          type: 'cell',
+        },
+      ]
+    },
+    {
+      id: 'row2',
+      isHeader: true,
+      coordinates: { x: 0, y: 50, width: 200, height: 50 },
+      styles: { stroke: 'green', fill: 'transparent' },
+      type: 'row',
+      cells: [
+        {
+          id: 'cell21',
+          isNull: false,
+          colSpan: 1,
+          rowSpan: 1,
+          value: 'c-21',
+          coordinates: { x: 0, y: 50, width: 200, height: 50 },
+          styles: { stroke: 'yellow', fill: '#ccc' },
+          type: 'cell',
+        },
+        {
+          id: 'cell22',
+          isNull: false,
+          colSpan: 1,
+          rowSpan: 1,
+          value: 'c-22',
+          coordinates: { x: 100, y: 50, width: 100, height: 50 },
+          styles: { stroke: 'yellow', fill: '#ccc' },
+          type: 'cell',
+        },
+      ]
+    },
+  ],
+};
+
+
+const tableCords = [{
+    ...tableData.coordinates,
+    ...tableData.styles,
+  type: tableData.type,
+  id: tableData.id,
+}];
+
+const tableRowCellCords = tableData.tableRows.reduce((acc, cord) => {
+    acc.tableRowCords.push({
+    ...cord.coordinates,
+    ...cord.styles,
+  type: cord.type,
+  id: cord.id,
+});
+const cells = cord.cells.map(cell => ({
+    ...cell.coordinates,
+    ...cell.styles,
+  type: cell.type,
+  id: cell.id,
+}));
+acc.tableCellCords = [...acc.tableCellCords, ...cells];
+return acc;
+}, { tableRowCords: [], tableCellCords: [] });
+
+const tableColCords = tableData.tableCols.map(col => ({
+    ...col.coordinates,
+    ...col.styles,
+  type: col.type,
+  id: col.id,
+}));
+
+const { tableRowCords, tableCellCords } = tableRowCellCords;
+
+
+const Rectangle = ({
+  x, y, width, height, fill, stroke, className,
+}) => (
+  <rect
+    x={x}
+    y={y}
+    width={width}
+    height={height}
+    // fill={fill}
+    fill="none"
+    stroke={stroke}
+    className={className}
+  />
+)
+
+const drawRectangles = (rectangles, customClassName) => rectangles
+  .map(({
+    x, y, width, height, fill, stroke, className,
+  }) =>(
+    <Rectangle
+      x={x}
+      y={y}
+      width={width}
+      height={height}
+      fill={fill}
+      stroke={stroke}
+      className={classNames(customClassName, className)}
+    />
+  ));
 
 class App extends Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      mode: 'view', // view | edit,
+      editEntity: 'cell', // 'cell' | 'column' | 'row' | 'table'
+      editActionType: 'merge', // 'merge' | 'delete'
+    };
+  }
+
   render() {
+    const { mode, editEntity } = this.state;
+    const applyHiddenClassName = (entityName) => mode === 'edit' && editEntity !== entityName ? 'noDisplay' : '';
+
+    const tableClassNames = applyHiddenClassName('table');
+    const tableRowClassNames = applyHiddenClassName('row');
+    const tableColumnClassNames = applyHiddenClassName('column');
+    const tableCellClassNames = applyHiddenClassName('cell');
+
     return (
       <div className="App">
         <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
+
+          <label for="modeSelect">Mode: </label>
+          <select
+            id="modeSelect"
+            value={this.state.mode}
+            onChange={e => this.setState({ mode: e.target.value })}
           >
-            Learn React
-          </a>
+            <option value="view">view</option>
+            <option value="edit">edit</option>
+          </select>
+
+          <label htmlFor="editEntitySelect">Mode: </label>
+          <select
+            id="editEntitySelect"
+            value={this.state.editEntity}
+            onChange={e => this.setState({ editEntity: e.target.value })}
+          >
+            <option value="cell">cell</option>
+            <option value="column">column</option>
+            <option value="row">row</option>
+            <option value="table">table</option>
+          </select>
+          <svg>
+            {drawRectangles(tableCords, tableClassNames)}
+            {drawRectangles(tableRowCords, tableRowClassNames)}
+            {drawRectangles(tableColCords, tableColumnClassNames)}
+            {drawRectangles(tableCellCords, tableCellClassNames)}
+          </svg>
         </header>
       </div>
     );
