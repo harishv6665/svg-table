@@ -383,6 +383,13 @@ const drawSplitLine = ({
   />
 );
 
+const getRelativeSVGPoints = (e, svgElement) => {
+  let pt = svgElement.createSVGPoint();
+  pt.x = e.clientX; pt.y = e.clientY;
+  const hoverCoordinates = pt.matrixTransform(svgElement.getScreenCTM().inverse());
+  return hoverCoordinates;
+}
+
 class App extends Component {
 
   constructor(props) {
@@ -394,6 +401,7 @@ class App extends Component {
       selectedItems: new Set([]),
       splitLineCoordinates: null,
       splitAxis: 'horizontal', // 'horizontal', 'vertical'
+      drawnTable: {},
     };
     this.handleClick = this.handleClick.bind(this);
     this.handleMouseMove = this.handleMouseMove.bind(this);
@@ -402,6 +410,7 @@ class App extends Component {
     this.selectEditEntity = this.selectEditEntity.bind(this);
     this.selectEditAction = this.selectEditAction.bind(this);
     this.selectSplitAxis = this.selectSplitAxis.bind(this);
+    this.onMouseDraw = this.onMouseDraw.bind(this);
   }
 
   handleMouseMove(e, item) {
@@ -508,6 +517,18 @@ class App extends Component {
     })
   }
 
+  onMouseDraw(e) {
+    const p = getRelativeSVGPoints(e, this.tableDrawCanvasSvg);
+    console.log('mousemove p:', p);
+    this.setState({
+      drawnTable: {
+        ...this.state.drawnTable,
+        x2: p.x,
+        y2: p.y,
+      }
+    });
+  }
+
   render() {
     const { mode, editEntity, editAction, selectedItems, splitLineCoordinates } = this.state;
     const applyHiddenClassName = (entityName) => mode === 'edit' && editEntity !== entityName ? 'noDisplay' : '';
@@ -552,6 +573,9 @@ class App extends Component {
       this.handleMouseMove,
       this.handleMouseOut,
     ));
+
+    console.log('width: ', this.state.drawnTable.x2 - this.state.drawnTable.x1);
+    console.log('height: ', this.state.drawnTable.y2 - this.state.drawnTable.y1);
 
     return (
       <div className="App">
@@ -618,6 +642,62 @@ class App extends Component {
             {tableFigure}
             {splitLineCoordinates && drawSplitLine(splitLineCoordinates)}
           </svg>
+          <svg
+            ref={r => this.tableDrawCanvasSvg = r}
+            width={300}
+            height={300}
+            style={{ background: 'white', cursor: 'crosshair' }}
+            onMouseDown={(e) => {
+              const p = getRelativeSVGPoints(e, this.tableDrawCanvasSvg);
+              console.log({ p });
+              this.setState({
+                drawnTable: {
+                  x1: p.x,
+                  y1: p.y,
+                }
+              })
+              this.tableDrawCanvasSvg.addEventListener('mousemove', this.onMouseDraw)
+            }}
+            onMouseUp={() => {
+              this.tableDrawCanvasSvg.removeEventListener('mousemove', this.onMouseDraw)
+            }}
+            // onMouseDown={() => {
+            //   const nextTableIndex = this.state.drawnTables.count();
+            //
+            // }}
+            // onMouseUp={}
+          >
+            {
+              this.state.drawnTable.x1 &&
+              this.state.drawnTable.x2 &&
+              <rect
+                x={Math.min(this.state.drawnTable.x1, this.state.drawnTable.x2)}
+                y={Math.min(this.state.drawnTable.y1, this.state.drawnTable.y2)}
+                width={Math.abs(this.state.drawnTable.x2 - this.state.drawnTable.x1)}
+                height={Math.abs(this.state.drawnTable.y2 - this.state.drawnTable.y1)}
+                fill="transparent"
+                stroke="black"
+                // className={className}
+                // onClick={onClick}
+                // onMouseMove={onMouseMove}
+                // onMouseOut={onMouseOut}
+                // fillOpacity={fillOpacity}
+              />
+            }
+          </svg>
+          {/*{*/}
+            {/*this.state.drawnTable.x1 &&*/}
+            {/*this.state.drawnTable.x2 &&*/}
+            {/*<button onClick={() => {*/}
+              {/*this.setState({*/}
+                {/*nextTable: {*/}
+                  {/*x: th*/}
+                {/*}*/}
+              {/*})*/}
+            {/*}}>*/}
+              {/*Create Table*/}
+            {/*</button>*/}
+          {/*}*/}
         </div>
       </div>
     );
