@@ -411,6 +411,7 @@ class App extends Component {
     this.selectEditAction = this.selectEditAction.bind(this);
     this.selectSplitAxis = this.selectSplitAxis.bind(this);
     this.onMouseDraw = this.onMouseDraw.bind(this);
+    this.createNextTable = this.createNextTable.bind(this);
   }
 
   handleMouseMove(e, item) {
@@ -527,6 +528,21 @@ class App extends Component {
         y2: p.y,
       }
     });
+  }
+
+
+  createNextTable(e) {
+    const getCoordinates = ({x1, y1, x2, y2}) => ({
+      x: Math.min(x1, x2),
+      y: Math.min(y1, y2),
+      width: Math.abs(x2 - x1),
+      height: Math.abs(y2 - y1),
+    })
+    const tableObj = {
+      type: 'table',
+      coordinates: getCoordinates(this.state.drawnTable),
+    };
+    console.log('tableObj: ', tableObj)
   }
 
   render() {
@@ -685,19 +701,13 @@ class App extends Component {
               />
             }
           </svg>
-          {/*{*/}
-            {/*this.state.drawnTable.x1 &&*/}
-            {/*this.state.drawnTable.x2 &&*/}
-            {/*<button onClick={() => {*/}
-              {/*this.setState({*/}
-                {/*nextTable: {*/}
-                  {/*x: th*/}
-                {/*}*/}
-              {/*})*/}
-            {/*}}>*/}
-              {/*Create Table*/}
-            {/*</button>*/}
-          {/*}*/}
+          {
+            this.state.drawnTable.x1 &&
+            this.state.drawnTable.x2 &&
+            <button onClick={this.createNextTable}>
+              Create Table
+            </button>
+          }
         </div>
       </div>
     );
