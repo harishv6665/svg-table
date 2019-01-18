@@ -125,7 +125,7 @@ const { tableRowCords, tableCellCords } = tableRowCellCords;
 const Rectangle = ({
   x, y, width, height, fill, stroke,
   className, selectedItems, onClick,
-  onHover, id, fillOpacity,
+  onMouseMove, id, fillOpacity,
   onMouseOut,
 }) => (
   <rect
@@ -137,14 +137,15 @@ const Rectangle = ({
     stroke={stroke}
     className={className}
     onClick={onClick}
-    onMouseMove={onHover}
+    onMouseMove={onMouseMove}
     onMouseOut={onMouseOut}
     fillOpacity={fillOpacity}
   />
 )
 
 const drawRectangles = (
-  rectangles, customClassName, selectedItems, onClick, onHover,
+  rectangles, customClassName, selectedItems, onClick,
+  onMouseMove,
   onMouseOut,
 ) => rectangles
   .map((data) => {
@@ -162,8 +163,7 @@ const drawRectangles = (
         fill={selectedItems.has(id) ? "blue" : "transparent"}
         className={classNames(customClassName, className)}
         onClick={e => {onClick(e, data);}}
-        onHover={e => {onHover(e, data);}}
-        onHover={e => {onHover(e, data);}}
+        onMouseMove={e => {onMouseMove(e, data);}}
         onMouseOut={e => {onMouseOut(e, data);}}
         selectedItems={selectedItems}
         fillOpacity={selectedItems.has(id) ? .2 : 1}
@@ -201,14 +201,14 @@ class App extends Component {
       splitLineCoordinates: null,
     };
     this.handleClick = this.handleClick.bind(this);
-    this.handleHover = this.handleHover.bind(this);
+    this.handleMouseMove = this.handleMouseMove.bind(this);
     this.handleMouseOut = this.handleMouseOut.bind(this);
     this.selectMode = this.selectMode.bind(this);
     this.selectEditEntity = this.selectEditEntity.bind(this);
     this.selectEditAction = this.selectEditAction.bind(this);
   }
 
-  handleHover(e, item) {
+  handleMouseMove(e, item) {
     if (this.state.mode !== 'view' && this.state.editAction === 'split') {
       e.stopPropagation();
       let pt = this.svgRef.createSVGPoint();
@@ -234,14 +234,19 @@ class App extends Component {
   }
 
   handleClick(e, item) {
-    if (this.state.mode !== 'view') {
+    const { mode, editAction } = this.state;
+    if (mode !== 'view') {
       e.stopPropagation();
       console.log('item ', item.id, ' clicked of type: ', item.type, ' for action: ', this.state.editAction)
-      const { selectedItems } = this.state;
-      this.setState({
-        selectedItems: selectedItems.has(item.id) ?
-          (this.state.selectedItems.delete(item.id) && this.state.selectedItems) : this.state.selectedItems.add(item.id),
-      })
+      if ( editAction === 'split') {
+
+      } else {
+        const { selectedItems } = this.state;
+        this.setState({
+          selectedItems: selectedItems.has(item.id) ?
+            (this.state.selectedItems.delete(item.id) && this.state.selectedItems) : this.state.selectedItems.add(item.id),
+        })
+      }
     } else {
       // highlightTableData();
     }
@@ -312,7 +317,7 @@ class App extends Component {
       entityCoordinates.className,
       selectedItems,
       this.handleClick,
-      this.handleHover,
+      this.handleMouseMove,
       this.handleMouseOut,
     ));
 
