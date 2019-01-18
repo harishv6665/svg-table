@@ -199,6 +199,7 @@ class App extends Component {
       editAction: 'merge', // 'merge' | 'delete' | 'split'
       selectedItems: new Set([]),
       splitLineCoordinates: null,
+      splitAxis: 'horizontal', // 'horizontal', 'vertical'
     };
     this.handleClick = this.handleClick.bind(this);
     this.handleMouseMove = this.handleMouseMove.bind(this);
@@ -206,21 +207,40 @@ class App extends Component {
     this.selectMode = this.selectMode.bind(this);
     this.selectEditEntity = this.selectEditEntity.bind(this);
     this.selectEditAction = this.selectEditAction.bind(this);
+    this.selectSplitAxis = this.selectSplitAxis.bind(this);
   }
 
   handleMouseMove(e, item) {
+    const getLineCoordinates = (item, hoverCoordinates, axis) => {
+      const getLineCoordinatesByAxis = (item, hoverCoordinates, horizontalAxis) => (
+        horizontalAxis ? ({
+          x1: item.x,
+          y1: hoverCoordinates.y,
+          x2: item.x + item.width,
+          y2: hoverCoordinates.y,
+        }) : ({
+          x1: hoverCoordinates.x,
+          y1: item.y,
+          x2: hoverCoordinates.x,
+          y2: item.y + item.height,
+        })
+      );
+      if (item.type === 'row') {
+        return getLineCoordinatesByAxis(item, hoverCoordinates, true)
+      } else if (item.type === 'col') {
+        return getLineCoordinatesByAxis(item, hoverCoordinates, false)
+      }
+      return getLineCoordinatesByAxis(item, hoverCoordinates, this.state.splitAxis === 'horizontal');
+    };
+
     if (this.state.mode !== 'view' && this.state.editAction === 'split') {
       e.stopPropagation();
       let pt = this.svgRef.createSVGPoint();
       pt.x = e.clientX; pt.y = e.clientY;
       const hoverCoordinates = pt.matrixTransform(this.svgRef.getScreenCTM().inverse());
       this.setState({
-        splitLineCoordinates: {
-        x1: hoverCoordinates.x,
-        y1: item.y,
-        x2: hoverCoordinates.x,
-        y2: item.y + item.height,
-      }})
+        splitLineCoordinates: getLineCoordinates(item, hoverCoordinates),
+      })
       // console.log({ l });
       // console.log('item ', item.id, ' hovered of type: ', item.type, ' for action: ', this.state.editAction, e.clientX, e.clientY)
       // const { selectedItems } = this.state;
@@ -279,14 +299,23 @@ class App extends Component {
     })
   }
 
+  selectSplitAxis(e) {
+    this.setState({
+      splitAxis: e.target.value,
+    })
+  }
+
   render() {
-    const { mode, editEntity, selectedItems, splitLineCoordinates } = this.state;
+    const { mode, editEntity, editAction, selectedItems, splitLineCoordinates } = this.state;
     const applyHiddenClassName = (entityName) => mode === 'edit' && editEntity !== entityName ? 'noDisplay' : '';
 
     const tableClassNames = applyHiddenClassName('table');
     const tableRowClassNames = mode === 'view' ? 'noDisplay' : applyHiddenClassName('row');
     const tableColumnClassNames = mode === 'view' ? 'noDisplay' : applyHiddenClassName('column');
     const tableCellClassNames = applyHiddenClassName('cell');
+    const showSplitAxisDropDown = (mode === 'edit')
+      && (editAction === 'split' || editAction === 'split')
+      && (editEntity === 'table' || editEntity === 'cell')
 
     const entityCoordinatesList = [
       {
@@ -325,6 +354,7 @@ class App extends Component {
       <div className="App">
         <header className="App-header">
           <div className="modesListContainer">
+
             <div className="modeContainer">
               <label htmlFor="modeSelect">Mode: </label>
               <select
@@ -336,6 +366,7 @@ class App extends Component {
                 <option value="edit">edit</option>
               </select>
             </div>
+
             <div className="modeContainer">
               <label htmlFor="editEntitySelect">Editing entity: </label>
               <select
@@ -349,6 +380,7 @@ class App extends Component {
                 <option value="table">table</option>
               </select>
             </div>
+
             <div className="modeContainer">
               <label htmlFor="editEntitySelect">Editing Action: </label>
               <select
@@ -361,6 +393,21 @@ class App extends Component {
                 <option value="split">Split</option>
               </select>
             </div>
+
+            {
+              showSplitAxisDropDown &&
+              <div className="modeContainer">
+              <label htmlFor="splitAxisSelect">Split Axis: </label>
+              <select
+                id="splitAxisSelect"
+                value={this.state.splitAxis}
+                onChange={ this.selectSplitAxis }
+              >
+                <option value="horizontal">Horizontal</option>
+                <option value="vertical">Vertical</option>
+              </select>
+            </div>
+            }
           </div>
         </header>
         <div className="App-content">
