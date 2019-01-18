@@ -126,6 +126,7 @@ const Rectangle = ({
   x, y, width, height, fill, stroke,
   className, selectedItems, onClick,
   onHover, id, fillOpacity,
+  onMouseOut,
 }) => (
   <rect
     x={x}
@@ -137,11 +138,15 @@ const Rectangle = ({
     className={className}
     onClick={onClick}
     onMouseMove={onHover}
+    onMouseOut={onMouseOut}
     fillOpacity={fillOpacity}
   />
 )
 
-const drawRectangles = (rectangles, customClassName, selectedItems, onClick, onHover) => rectangles
+const drawRectangles = (
+  rectangles, customClassName, selectedItems, onClick, onHover,
+  onMouseOut,
+) => rectangles
   .map((data) => {
     const {
       x, y, width, height, fill, stroke, className, id,
@@ -158,6 +163,8 @@ const drawRectangles = (rectangles, customClassName, selectedItems, onClick, onH
         className={classNames(customClassName, className)}
         onClick={e => {onClick(e, data);}}
         onHover={e => {onHover(e, data);}}
+        onHover={e => {onHover(e, data);}}
+        onMouseOut={e => {onMouseOut(e, data);}}
         selectedItems={selectedItems}
         fillOpacity={selectedItems.has(id) ? .2 : 1}
     />
@@ -195,6 +202,10 @@ class App extends Component {
     };
     this.handleClick = this.handleClick.bind(this);
     this.handleHover = this.handleHover.bind(this);
+    this.handleMouseOut = this.handleMouseOut.bind(this);
+    this.selectMode = this.selectMode.bind(this);
+    this.selectEditEntity = this.selectEditEntity.bind(this);
+    this.selectEditAction = this.selectEditAction.bind(this);
   }
 
   handleHover(e, item) {
@@ -236,6 +247,33 @@ class App extends Component {
     }
   }
 
+  handleMouseOut(e, item) {
+    this.setState({
+      splitLineCoordinates: null,
+    })
+  }
+
+  selectMode(e) {
+    this.setState({
+      mode: e.target.value,
+      selectedItems: new Set([]),
+    })
+  }
+
+  selectEditEntity(e) {
+    this.setState({
+      editEntity: e.target.value,
+      selectedItems: new Set([]),
+    })
+  }
+
+  selectEditAction(e) {
+    this.setState({
+      editAction: e.target.value,
+      selectedItems: new Set([]),
+    })
+  }
+
   render() {
     const { mode, editEntity, selectedItems, splitLineCoordinates } = this.state;
     const applyHiddenClassName = (entityName) => mode === 'edit' && editEntity !== entityName ? 'noDisplay' : '';
@@ -244,6 +282,39 @@ class App extends Component {
     const tableRowClassNames = mode === 'view' ? 'noDisplay' : applyHiddenClassName('row');
     const tableColumnClassNames = mode === 'view' ? 'noDisplay' : applyHiddenClassName('column');
     const tableCellClassNames = applyHiddenClassName('cell');
+
+    const entityCoordinatesList = [
+      {
+        coordinates: tableCords,
+        className: tableClassNames,
+        type: 'table',
+      },
+      {
+        coordinates: tableRowCords,
+        type: 'row',
+        className: tableRowClassNames,
+
+      },
+      {
+        coordinates: tableColCords,
+        type: 'col',
+        className: tableColumnClassNames,
+      },
+      {
+        coordinates: tableCellCords,
+        type: 'cell',
+        className: tableCellClassNames,
+      },
+    ];
+
+    const tableFigure = entityCoordinatesList.map(entityCoordinates => drawRectangles(
+      entityCoordinates.coordinates,
+      entityCoordinates.className,
+      selectedItems,
+      this.handleClick,
+      this.handleHover,
+      this.handleMouseOut,
+    ));
 
     return (
       <div className="App">
@@ -254,10 +325,7 @@ class App extends Component {
               <select
                 id="modeSelect"
                 value={this.state.mode}
-                onChange={e => this.setState({
-                  mode: e.target.value,
-                  selectedItems: new Set([]),
-                })}
+                onChange={ this.selectMode }
               >
                 <option value="view">view</option>
                 <option value="edit">edit</option>
@@ -268,10 +336,7 @@ class App extends Component {
               <select
                 id="editEntitySelect"
                 value={this.state.editEntity}
-                onChange={e => this.setState({
-                  editEntity: e.target.value,
-                  selectedItems: new Set([]),
-                })}
+                onChange={this.selectEditEntity}
               >
                 <option value="cell">cell</option>
                 <option value="column">column</option>
@@ -284,10 +349,7 @@ class App extends Component {
               <select
                 id="editActionSelect"
                 value={this.state.editAction}
-                onChange={e => this.setState({
-                  editAction: e.target.value,
-                  selectedItems: new Set([]),
-                })}
+                onChange={ this.selectEditAction }
               >
                 <option value="merge">Merge</option>
                 <option value="delete">Delete</option>
@@ -298,10 +360,7 @@ class App extends Component {
         </header>
         <div className="App-content">
           <svg ref={r => this.svgRef = r}>
-            {drawRectangles(tableCords, tableClassNames, selectedItems, this.handleClick, this.handleHover)}
-            {drawRectangles(tableRowCords, tableRowClassNames, selectedItems, this.handleClick, this.handleHover)}
-            {drawRectangles(tableColCords, tableColumnClassNames, selectedItems, this.handleClick, this.handleHover)}
-            {drawRectangles(tableCellCords, tableCellClassNames, selectedItems, this.handleClick, this.handleHover)}
+            {tableFigure}
             {splitLineCoordinates && drawSplitLine(splitLineCoordinates)}
           </svg>
         </div>
