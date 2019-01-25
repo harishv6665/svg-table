@@ -3,7 +3,7 @@ import './App.css';
 import Header from './components/Header/Header';
 import drawRectangles from './components/SvgUtils/drawRectangles';
 import drawSplitLine from './components/SvgUtils/drawSplitLine';
-import { tableCellCords, tableColCords, tableCords, tableData, tableRowCords } from './components/SvgUtils/tableData';
+import { getTableColCords, getTableCords, tableData, getTableRowCellCords, generateNewTable } from './components/SvgUtils/tableData';
 
 const getRelativeSVGPoints = (e, svgElement) => {
   let pt = svgElement.createSVGPoint();
@@ -18,6 +18,7 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      tableData: tableData,
       mode: 'view', // view | edit,
       editEntity: 'cell', // 'cell' | 'column' | 'row' | 'table'
       editAction: 'merge', // 'merge' | 'delete' | 'split'
@@ -167,6 +168,8 @@ class App extends Component {
       coordinates: getCoordinates(this.state.drawnTable),
     };
     console.log('tableObj: ', tableObj);
+    const newTableData = generateNewTable(tableObj.coordinates);
+    this.setState({ tableData: newTableData });
   }
 
   render() {
@@ -181,25 +184,27 @@ class App extends Component {
       && (editAction === 'split' || editAction === 'split')
       && (editEntity === 'table' || editEntity === 'cell');
 
+    const tableRowCellCords = getTableRowCellCords(this.state.tableData);
+
     const entityCoordinatesList = [
       {
-        coordinates: tableCords,
+        coordinates: getTableCords(this.state.tableData),
         className: tableClassNames,
         type: 'table',
       },
       {
-        coordinates: tableRowCords,
+        coordinates: tableRowCellCords.tableRowCords,
         type: 'row',
         className: tableRowClassNames,
 
       },
       {
-        coordinates: tableColCords,
+        coordinates: getTableColCords(this.state.tableData),
         type: 'col',
         className: tableColumnClassNames,
       },
       {
-        coordinates: tableCellCords,
+        coordinates: tableRowCellCords.tableCellCords,
         type: 'cell',
         className: tableCellClassNames,
       },
@@ -231,58 +236,64 @@ class App extends Component {
           onAxisChange={this.selectSplitAxis}
         />
         <div className="App-content">
-          <svg
-            ref={r => this.svgRef = r}
-            width={tableData.coordinates.width + 10}
-            height={tableData.coordinates.height + 10}>
-            {tableFigure}
-            {splitLineCoordinates && drawSplitLine(splitLineCoordinates)}
-          </svg>
-          <svg
-            ref={r => this.tableDrawCanvasSvg = r}
-            width={300}
-            height={300}
-            style={{ background: 'white', cursor: 'crosshair' }}
-            onMouseDown={(e) => {
-              const p = getRelativeSVGPoints(e, this.tableDrawCanvasSvg);
-              console.log({ p });
-              this.setState({
-                drawnTable: {
-                  x1: p.x,
-                  y1: p.y,
-                },
-              });
-              this.tableDrawCanvasSvg.addEventListener('mousemove', this.onMouseDraw);
-            }}
-            onMouseUp={() => {
-              this.tableDrawCanvasSvg.removeEventListener('mousemove', this.onMouseDraw);
-            }}
-            // onMouseDown={() => {
-            //   const nextTableIndex = this.state.drawnTables.count();
-            //
-            // }}
-            // onMouseUp={}
-          >
-            {
-              this.state.drawnTable.x1 &&
-              this.state.drawnTable.x2 &&
-              <rect
-                x={Math.min(this.state.drawnTable.x1, this.state.drawnTable.x2)}
-                y={Math.min(this.state.drawnTable.y1, this.state.drawnTable.y2)}
-                width={Math.abs(this.state.drawnTable.x2 - this.state.drawnTable.x1)}
-                height={Math.abs(this.state.drawnTable.y2 - this.state.drawnTable.y1)}
-                fill="transparent"
-                stroke="black"
-                // className={className}
-                // onClick={onClick}
-                // onMouseMove={onMouseMove}
-                // onMouseOut={onMouseOut}
-                // fillOpacity={fillOpacity}
-              />
-            }
-          </svg>
+          <div className="presentation-area">
+            <svg
+              ref={r => this.svgRef = r}
+              width="100%"
+              height="100%">
+              {tableFigure}
+              {splitLineCoordinates && drawSplitLine(splitLineCoordinates)}
+            </svg>
+          </div>
+          <div className="canvas-area">
+            <svg
+              ref={r => this.tableDrawCanvasSvg = r}
+              width="100%"
+              height="100%"
+              style={{ background: 'white', cursor: 'crosshair' }}
+              onMouseDown={(e) => {
+                const p = getRelativeSVGPoints(e, this.tableDrawCanvasSvg);
+                console.log({ p });
+                this.setState({
+                  drawnTable: {
+                    x1: p.x,
+                    y1: p.y,
+                  },
+                });
+                this.tableDrawCanvasSvg.addEventListener('mousemove', this.onMouseDraw);
+              }}
+              onMouseUp={() => {
+                this.tableDrawCanvasSvg.removeEventListener('mousemove', this.onMouseDraw);
+              }}
+              // onMouseDown={() => {
+              //   const nextTableIndex = this.state.drawnTables.count();
+              //
+              // }}
+              // onMouseUp={}
+            >
+              {
+                this.state.drawnTable.x1 &&
+                this.state.drawnTable.x2 &&
+                <rect
+                  x={Math.min(this.state.drawnTable.x1, this.state.drawnTable.x2)}
+                  y={Math.min(this.state.drawnTable.y1, this.state.drawnTable.y2)}
+                  width={Math.abs(this.state.drawnTable.x2 - this.state.drawnTable.x1)}
+                  height={Math.abs(this.state.drawnTable.y2 - this.state.drawnTable.y1)}
+                  fill="transparent"
+                  stroke="black"
+                  // className={className}
+                  // onClick={onClick}
+                  // onMouseMove={onMouseMove}
+                  // onMouseOut={onMouseOut}
+                  // fillOpacity={fillOpacity}
+                />
+              }
+            </svg>
+          </div>
+        </div>
+        <div className="footer">
           {this.state.drawnTable.x1 && this.state.drawnTable.x2 &&
-          <button onClick={this.createNextTable}>
+          <button className="footer-btn" onClick={this.createNextTable}>
             Create Table
           </button>}
         </div>

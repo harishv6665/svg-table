@@ -230,14 +230,14 @@ export const tableData = {
   ],
 };
 
-export const tableCords = [{
-  ...tableData.coordinates,
-  ...tableData.styles,
-  type: tableData.type,
-  id: tableData.id,
-}];
+export const getTableCords = (data) => ([{
+  ...data.coordinates,
+  ...data.styles,
+  type: data.type,
+  id: data.id,
+}]);
 
-export const tableRowCellCords = tableData.tableRows.reduce((acc, cord, rowIndex) => {
+export const getTableRowCellCords = (data) => data.tableRows.reduce((acc, cord, rowIndex) => {
   acc.tableRowCords.push({
     ...cord.coordinates,
     ...cord.styles,
@@ -260,7 +260,7 @@ export const tableRowCellCords = tableData.tableRows.reduce((acc, cord, rowIndex
   return acc;
 }, { tableRowCords: [], tableCellCords: [] });
 
-export const tableColCords = tableData.tableCols.map((col, columnIndex) => ({
+export const getTableColCords = (data) => data.tableCols.map((col, columnIndex) => ({
   ...col.coordinates,
   ...col.styles,
   type: col.type,
@@ -268,4 +268,41 @@ export const tableColCords = tableData.tableCols.map((col, columnIndex) => ({
   columnIndex,
 }));
 
-export const { tableRowCords, tableCellCords } = tableRowCellCords;
+
+export const generateNewTable = ({ x, y, width, height }) => ({
+  id: 't1',
+  confidenceScore: 50,
+  tag: 'Bank details',
+  coordinates: { x, y, width, height },
+  styles: { stroke: 'red', fill: 'transparent' },
+  type: 'table',
+  tableCols: [
+    {
+      id: 'col1',
+      coordinates: { x: x + 5, y: y + 5, width: width - 10, height: height - 10 },
+      styles: { stroke: 'blue', fill: 'transparent' },
+      type: 'col',
+    },
+  ],
+  tableRows: [
+    {
+      id: 'row1',
+      isHeader: true,
+      coordinates: { x: x + 5, y: y + 5, width: width - 10, height: height - 10 },
+      styles: { stroke: 'green', fill: 'transparent' },
+      type: 'row',
+      cells: [
+        {
+          id: 'cell11',
+          isNull: false,
+          colSpan: 1,
+          rowSpan: 1,
+          value: 'c-11',
+          coordinates: { x: x + 5, y: y + 5, width: width - 10, height: height - 10 },
+          styles: { stroke: 'yellow', fill: '#ccc' },
+          type: 'cell',
+        },
+      ]
+    },
+  ],
+});
