@@ -8,25 +8,25 @@ export const tableData = {
   tableCols: [
     {
       id: 'col1',
-      coordinates: { x: 5, y: 5, width: 90, height: 90 },
+      coordinates: { x: 5, y: 5, width: 90, height: 180 },
       styles: { stroke: 'blue', fill: 'transparent' },
       type: 'col',
     },
     {
       id: 'col2',
-      coordinates: { x: 105, y: 5, width: 90, height: 90 },
+      coordinates: { x: 105, y: 5, width: 90, height: 180 },
       styles: { stroke: 'blue', fill: 'transparent' },
       type: 'col',
     },
     {
       id: 'col3',
-      coordinates: { x: 205, y: 5, width: 90, height: 90 },
+      coordinates: { x: 205, y: 5, width: 90, height: 180 },
       styles: { stroke: 'blue', fill: 'transparent' },
       type: 'col',
     },
     {
       id: 'col4',
-      coordinates: { x: 305, y: 5, width: 90, height: 90 },
+      coordinates: { x: 305, y: 5, width: 90, height: 180 },
       styles: { stroke: 'blue', fill: 'transparent' },
       type: 'col',
     },
@@ -35,7 +35,7 @@ export const tableData = {
     {
       id: 'row1',
       isHeader: true,
-      coordinates: { x: 5, y: 5, width: 180, height: 45 },
+      coordinates: { x: 5, y: 5, width: 365, height: 45 },
       styles: { stroke: 'green', fill: 'transparent' },
       type: 'row',
       cells: [
@@ -82,7 +82,7 @@ export const tableData = {
     {
       id: 'row2',
       isHeader: true,
-      coordinates: { x: 5, y: 55, width: 180, height: 45 },
+      coordinates: { x: 5, y: 55, width: 365, height: 45 },
       styles: { stroke: 'green', fill: 'transparent' },
       type: 'row',
       cells: [
@@ -132,7 +132,7 @@ export const tableData = {
     {
       id: 'row3',
       isHeader: true,
-      coordinates: { x: 5, y: 105, width: 180, height: 45 },
+      coordinates: { x: 5, y: 105, width: 365, height: 45 },
       styles: { stroke: 'green', fill: 'transparent' },
       type: 'row',
       cells: [
@@ -182,7 +182,7 @@ export const tableData = {
     {
       id: 'row4',
       isHeader: true,
-      coordinates: { x: 5, y: 155, width: 180, height: 45 },
+      coordinates: { x: 5, y: 155, width: 365, height: 45 },
       styles: { stroke: 'green', fill: 'transparent' },
       type: 'row',
       cells: [
