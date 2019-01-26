@@ -3,7 +3,13 @@ import './App.css';
 import Header from './components/Header/Header';
 import drawRectangles from './components/SvgUtils/drawRectangles';
 import drawSplitLine from './components/SvgUtils/drawSplitLine';
-import { getTableColCords, getTableCords, tableData, getTableRowCellCords, generateNewTable } from './components/SvgUtils/tableData';
+import {
+  generateNewTable,
+  getTableColCords,
+  getTableCords,
+  getTableRowCellCords,
+  tableData,
+} from './components/SvgUtils/tableData';
 
 const getRelativeSVGPoints = (e, svgElement) => {
   let pt = svgElement.createSVGPoint();
@@ -14,7 +20,6 @@ const getRelativeSVGPoints = (e, svgElement) => {
 };
 
 class App extends Component {
-
   constructor(props) {
     super(props);
     this.state = {
@@ -39,7 +44,7 @@ class App extends Component {
   }
 
   handleMouseMove(e, item) {
-    console.log('item ', item.id, ' hovered of type: ', item.type, ' for action: ', this.state.editAction, ' data: ', item);
+    // console.log('item ', item.id, ' hovered of type: ', item.type, ' for action: ', this.state.editAction, ' data: ', item);
     const getLineCoordinates = (item, hoverCoordinates, axis) => {
       const getLineCoordinatesByAxis = (item, hoverCoordinates, horizontalAxis) => {
         let itemWidth = item.width;
@@ -96,6 +101,7 @@ class App extends Component {
     if (mode !== 'view') {
       e.stopPropagation();
       console.log('item ', item.id, ' clicked of type: ', item.type, ' for action: ', this.state.editAction);
+      console.log('wwww', e.nativeEvent.offsetX, e.nativeEvent.offsetY);
       if (editAction === 'split') {
 
       } else {
@@ -154,7 +160,6 @@ class App extends Component {
       },
     });
   }
-
 
   createNextTable(e) {
     const getCoordinates = ({ x1, y1, x2, y2 }) => ({
@@ -219,8 +224,8 @@ class App extends Component {
       this.handleMouseOut,
     ));
 
-    console.log('width: ', this.state.drawnTable.x2 - this.state.drawnTable.x1);
-    console.log('height: ', this.state.drawnTable.y2 - this.state.drawnTable.y1);
+    // console.log('width: ', this.state.drawnTable.x2 - this.state.drawnTable.x1);
+    // console.log('height: ', this.state.drawnTable.y2 - this.state.drawnTable.y1);
 
     return (
       <div className="App">

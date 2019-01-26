@@ -3,7 +3,6 @@ import React from 'react';
 const Header = ({ modeValue, onModeChange, editValue, onEditChange, actionValue, onActionChange, showAxisInput, axisValue, onAxisChange }) => (
   <header className="App-header">
     <div className="modesListContainer">
-
       <div className="modeContainer">
         <label htmlFor="modeSelect">Mode: </label>
         <select
@@ -45,15 +44,15 @@ const Header = ({ modeValue, onModeChange, editValue, onEditChange, actionValue,
 
       {showAxisInput &&
       <div className="modeContainer">
-      <label htmlFor="splitAxisSelect">Split Axis: </label>
-      <select
-      id="splitAxisSelect"
-      value={axisValue}
-      onChange={onAxisChange}
-      >
-      <option value="horizontal">Horizontal</option>
-      <option value="vertical">Vertical</option>
-      </select>
+        <label htmlFor="splitAxisSelect">Split Axis: </label>
+        <select
+          id="splitAxisSelect"
+          value={axisValue}
+          onChange={onAxisChange}
+        >
+          <option value="horizontal">Horizontal</option>
+          <option value="vertical">Vertical</option>
+        </select>
       </div>}
     </div>
   </header>
