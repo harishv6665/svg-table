@@ -100,9 +100,14 @@ class App extends Component {
     const { mode, editAction } = this.state;
     if (mode !== 'view') {
       e.stopPropagation();
-      console.log('item ', item.id, ' clicked of type: ', item.type, ' for action: ', this.state.editAction);
-      console.log('wwww', e.nativeEvent.offsetX, e.nativeEvent.offsetY);
       if (editAction === 'split') {
+        console.log('item ', item.id, ' clicked of type: ', item.type, ' for action: ', this.state.editAction);
+        console.log('wwww', e.nativeEvent.offsetX, e.nativeEvent.offsetY, this.state.tableData);
+
+        let newValue = JSON.parse(JSON.stringify(this.state.tableData));
+        console.log({ newValue, tableRows: newValue.tableRows });
+
+
 
       } else {
         const { selectedItems } = this.state;
