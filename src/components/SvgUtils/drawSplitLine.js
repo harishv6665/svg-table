@@ -12,8 +12,8 @@ const drawSplitLine = ({
     x2={x2}
     y2={y2}
     stroke="white"
-    stroke-width=".01"
-    stroke-dasharray=".2"
+    strokeWidth=".01"
+    strokeDasharray=".2"
     strokeOpacity={1}
     style={{ pointerEvents: 'none' }}
   />

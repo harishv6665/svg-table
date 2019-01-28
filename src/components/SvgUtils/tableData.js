@@ -286,7 +286,7 @@ export const generateNewTable = ({ x, y, width, height }) => ({
   ],
   tableRows: [
     {
-      id: 'row1',
+      id: 'row11',
       isHeader: true,
       coordinates: { x: x + 5, y: y + 5, width: width - 10, height: height - 10 },
       styles: { stroke: 'green', fill: 'transparent' },

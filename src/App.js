@@ -24,9 +24,9 @@ class App extends Component {
     super(props);
     this.state = {
       tableData: tableData,
-      mode: 'view', // view | edit,
-      editEntity: 'cell', // 'cell' | 'column' | 'row' | 'table'
-      editAction: 'merge', // 'merge' | 'delete' | 'split'
+      mode: 'edit', // view | edit,
+      editEntity: 'row', // 'cell' | 'column' | 'row' | 'table'
+      editAction: 'split', // 'merge' | 'delete' | 'split'
       selectedItems: new Set([]),
       splitLineCoordinates: null,
       splitAxis: 'horizontal', // 'horizontal', 'vertical'
@@ -41,6 +41,7 @@ class App extends Component {
     this.selectSplitAxis = this.selectSplitAxis.bind(this);
     this.onMouseDraw = this.onMouseDraw.bind(this);
     this.createNextTable = this.createNextTable.bind(this);
+    this.toDrawRows = this.toDrawRows.bind(this);
   }
 
   handleMouseMove(e, item) {
@@ -96,19 +97,95 @@ class App extends Component {
     }
   }
 
+  toDrawRows(e, item) {
+    console.log({ item });
+    console.log('this.state: ', this.state);
+    // console.log('x: ', e.nativeEvent.offsetX, 'y: ', e.nativeEvent.offsetY);
+    let newValue = JSON.parse(JSON.stringify(this.state.tableData));
+    const lineCoords = {
+      x1: this.state.tableData.tableRows[0].coordinates.x,
+      y1: e.nativeEvent.offsetY,
+      width: this.state.tableData.tableRows[0].coordinates.width,
+      height: e.nativeEvent.offsetY,
+    };
+
+    console.log(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
+
+    const tableRows = [
+      {
+        id: 'row1',
+        isHeader: false,
+        coordinates: {
+          x: this.state.drawnTable.x1,
+          y: this.state.drawnTable.y1,
+          width: this.state.drawnTable.x2 - this.state.drawnTable.x1,
+          height: e.nativeEvent.offsetY - this.state.drawnTable.y1,
+        },
+        styles: { stroke: 'green', fill: 'red' },
+        type: 'row',
+        cells: [
+          {
+            id: 'cell1',
+            isNull: false,
+            colSpan: 1,
+            rowSpan: 1,
+            value: 'cell-1',
+            coordinates: {
+              x: this.state.drawnTable.x1,
+              y: this.state.drawnTable.y1,
+              width: this.state.drawnTable.x2 - this.state.drawnTable.x1,
+              height: e.nativeEvent.offsetY - this.state.drawnTable.y1,
+            },
+            type: 'cell',
+          },
+        ],
+      },
+      {
+        id: 'row2',
+        isHeader: false,
+        coordinates: {
+          x: this.state.drawnTable.x1,
+          y: e.nativeEvent.offsetY,
+          width: this.state.drawnTable.x2 - this.state.drawnTable.x1,
+          height: this.state.drawnTable.y2 - e.nativeEvent.offsetY,
+        },
+        styles: { stroke: 'green', fill: 'red' },
+        type: 'row',
+        cells: [
+          {
+            id: 'cell1',
+            isNull: false,
+            colSpan: 1,
+            rowSpan: 1,
+            value: 'cell-1',
+            coordinates: {
+              x: this.state.drawnTable.x1,
+              y: e.nativeEvent.offsetY,
+              width: this.state.drawnTable.x2 - this.state.drawnTable.x1,
+              height: this.state.drawnTable.y2 - e.nativeEvent.offsetY,
+            },
+            type: 'cell',
+          },
+        ],
+      },
+    ];
+
+    this.setState({
+      tableData: {
+        ...newValue,
+        tableRows,
+      },
+    });
+  }
+
   handleClick(e, item) {
     const { mode, editAction } = this.state;
     if (mode !== 'view') {
       e.stopPropagation();
       if (editAction === 'split') {
-        console.log('item ', item.id, ' clicked of type: ', item.type, ' for action: ', this.state.editAction);
-        console.log('wwww', e.nativeEvent.offsetX, e.nativeEvent.offsetY, this.state.tableData);
-
-        let newValue = JSON.parse(JSON.stringify(this.state.tableData));
-        console.log({ newValue, tableRows: newValue.tableRows });
-
-
-
+        if (this.state.editEntity === 'row') {
+          this.toDrawRows(e, item);
+        }
       } else {
         const { selectedItems } = this.state;
         this.setState({
@@ -179,6 +256,7 @@ class App extends Component {
     };
     console.log('tableObj: ', tableObj);
     const newTableData = generateNewTable(tableObj.coordinates);
+    console.log('newTableData', newTableData);
     this.setState({ tableData: newTableData });
   }
 
