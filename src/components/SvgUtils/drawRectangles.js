@@ -8,7 +8,7 @@ const drawRectangles = (
   onMouseMove,
   onMouseOut,
 ) => rectangles
-  .map((data) => {
+  .map((data, index) => {
     const {
       x, y, width, height, fill, stroke, className, id, type, merged, colSpan=1, rowSpan=1,
       columnIndex, rowIndex
@@ -31,6 +31,7 @@ const drawRectangles = (
           };
           return (
             <Rectangle
+              key={`id ${id} - ${index}`}
               id={id}
               x={x}
               y={y}
@@ -39,7 +40,7 @@ const drawRectangles = (
               stroke={stroke}
               fill={selectedItems.has(id) ? "blue" : "transparent"}
               className={classNames(customClassName, className)}
-              onClick={e => {onClick(e, nextData);}}
+              onClick={e => { console.log('e: ',e); onClick(e, nextData);}}
               onMouseMove={e => {onMouseMove(e, nextData);}}
               onMouseOut={e => {onMouseOut(e, nextData);}}
               selectedItems={selectedItems}
@@ -52,6 +53,7 @@ const drawRectangles = (
     }
     return (
       <Rectangle
+        key={`id ${id} - ${index}`}
         id={id}
         x={x}
         y={y}
@@ -60,7 +62,7 @@ const drawRectangles = (
         stroke={stroke}
         fill={selectedItems.has(id) ? "blue" : "transparent"}
         className={classNames(customClassName, className)}
-        onClick={e => {onClick(e, data);}}
+        onClick={e => { console.log('e: ',e); onClick(e, data);}}
         onMouseMove={e => {onMouseMove(e, data);}}
         onMouseOut={e => {onMouseOut(e, data);}}
         selectedItems={selectedItems}

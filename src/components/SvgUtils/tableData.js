@@ -77,7 +77,7 @@ export const tableData = {
           styles: { stroke: 'yellow', fill: '#ccc' },
           type: 'cell',
         },
-      ]
+      ],
     },
     {
       id: 'row2',
@@ -105,7 +105,7 @@ export const tableData = {
           coordinates: { x: 100, y: 55, width: 85, height: 35 },
           styles: { stroke: 'yellow', fill: '#ccc' },
           type: 'cell',
-          merged: true
+          merged: true,
         }, {
           id: 'cell23',
           isNull: false,
@@ -127,7 +127,7 @@ export const tableData = {
           styles: { stroke: 'yellow', fill: '#ccc' },
           type: 'cell',
         },
-      ]
+      ],
     },
     {
       id: 'row3',
@@ -177,7 +177,7 @@ export const tableData = {
           styles: { stroke: 'yellow', fill: '#ccc' },
           type: 'cell',
         },
-      ]
+      ],
     },
     {
       id: 'row4',
@@ -225,7 +225,7 @@ export const tableData = {
           styles: { stroke: 'yellow', fill: '#ccc' },
           type: 'cell',
         },
-      ]
+      ],
     },
   ],
 };
@@ -302,7 +302,27 @@ export const generateNewTable = ({ x, y, width, height }) => ({
           styles: { stroke: 'yellow', fill: '#ccc' },
           type: 'cell',
         },
-      ]
+      ],
+    },
+  ],
+});
+
+export const generateNewTableRow = ({ id = 'x', isHeader = false, cords, styles = {}, cells }) => ({
+  id: id,
+  isHeader: isHeader,
+  coordinates: { x: cords.x, y: cords.y, width: cords.width, height: cords.height },
+  styles: { stroke: 'green', fill: 'transparent', ...styles },
+  type: 'row',
+  cells: [
+    {
+      id: 'cell11',
+      isNull: false,
+      colSpan: 1,
+      rowSpan: 1,
+      value: 'c-11',
+      coordinates: { x: 5, y: 5, width: 10, height: 10 },
+      styles: { stroke: 'yellow', fill: '#ccc' },
+      type: 'cell',
     },
   ],
 });

@@ -3,7 +3,14 @@ import './App.css';
 import Header from './components/Header/Header';
 import drawRectangles from './components/SvgUtils/drawRectangles';
 import drawSplitLine from './components/SvgUtils/drawSplitLine';
-import { getTableColCords, getTableCords, tableData, getTableRowCellCords, generateNewTable } from './components/SvgUtils/tableData';
+import { splitOrAddRow } from './components/SvgUtils/splitOrAddRow';
+import {
+  generateNewTable,
+  getTableColCords,
+  getTableCords,
+  getTableRowCellCords,
+  tableData,
+} from './components/SvgUtils/tableData';
 
 const getRelativeSVGPoints = (e, svgElement) => {
   let pt = svgElement.createSVGPoint();
@@ -19,12 +26,12 @@ class App extends Component {
     super(props);
     this.state = {
       tableData: tableData,
-      mode: 'view', // view | edit,
-      editEntity: 'cell', // 'cell' | 'column' | 'row' | 'table'
-      editAction: 'merge', // 'merge' | 'delete' | 'split'
+      mode: 'edit', // view | edit,
+      editEntity: 'row', // 'cell' | 'column' | 'row' | 'table'
+      editAction: 'split', // 'merge' | 'delete' | 'split'
       selectedItems: new Set([]),
       splitLineCoordinates: null,
-      splitAxis: 'horizontal', // 'horizontal', 'vertical'
+      splitAxis: 'vertical', // 'horizontal', 'vertical'
       drawnTable: {},
     };
     this.handleClick = this.handleClick.bind(this);
@@ -39,7 +46,7 @@ class App extends Component {
   }
 
   handleMouseMove(e, item) {
-    console.log('item ', item.id, ' hovered of type: ', item.type, ' for action: ', this.state.editAction, ' data: ', item);
+//    console.log('item ', item.id, ' hovered of type: ', item.type, ' for action: ', this.state.editAction, ' data: ', item);
     const getLineCoordinates = (item, hoverCoordinates, axis) => {
       const getLineCoordinatesByAxis = (item, hoverCoordinates, horizontalAxis) => {
         let itemWidth = item.width;
@@ -95,18 +102,30 @@ class App extends Component {
     const { mode, editAction } = this.state;
     if (mode !== 'view') {
       e.stopPropagation();
-      console.log('item ', item.id, ' clicked of type: ', item.type, ' for action: ', this.state.editAction);
-      if (editAction === 'split') {
-
-      } else {
-        const { selectedItems } = this.state;
-        this.setState({
-          selectedItems: selectedItems.has(item.id) ?
-            (this.state.selectedItems.delete(item.id) && this.state.selectedItems) : this.state.selectedItems.add(item.id),
-        });
-      }
-    } else {
-      // highlightTableData();
+      const cords = {
+        x: e.nativeEvent.offsetX,
+        y: e.nativeEvent.offsetY,
+      };
+      const newRows = splitOrAddRow({ cords, item, tableRows: this.state.tableData.tableRows });
+      console.log('newRows: ', newRows);
+      this.setState({ tableData: {
+          ...tableData,
+          tableRows: [ ...newRows ],
+        }});
+//      console.log('item ', item.id, ' clicked of type: ', item.type, ' for action: ', this.state.editAction);
+//      if (editAction === 'split' && item.type === 'col') {
+//        console.log('event: ', e.target);
+//        console.log('item: ', item);
+//      } else {
+//        const { selectedItems } = this.state;
+//        this.setState({
+//          selectedItems: selectedItems.has(item.id) ?
+//            (this.state.selectedItems.delete(item.id) && this.state.selectedItems) : this.state.selectedItems.add(item.id),
+//        });
+//      }
+//    } else {
+//      // highlightTableData();
+//    }
     }
   }
 
@@ -219,8 +238,8 @@ class App extends Component {
       this.handleMouseOut,
     ));
 
-    console.log('width: ', this.state.drawnTable.x2 - this.state.drawnTable.x1);
-    console.log('height: ', this.state.drawnTable.y2 - this.state.drawnTable.y1);
+//    console.log('width: ', this.state.drawnTable.x2 - this.state.drawnTable.x1);
+//    console.log('height: ', this.state.drawnTable.y2 - this.state.drawnTable.y1);
 
     return (
       <div className="App">
